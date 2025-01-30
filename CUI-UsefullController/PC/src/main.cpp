@@ -1,17 +1,11 @@
 #include "ASCII_CUI.hpp"    //https://github.com/kazu-321/ASCII_CUIより
-//#include <mbed.h>
+#include "main.hpp"
 
-/*
-exeファイルの作成方法 <-更新するときとか、消えたときとか
-（もしexeファイルがあるなら、削除してから)
-➀code runnerの設定を開く
-➁Run in Terminalのチェックを外す
-➂実行
-➃exeファイルの出現を確認出来たら、設定を外す
-*/
-
+//exeが消失およびC++を更新した時には、reload.batを実行してください
 
 // 事前に設定したい変数を定義
+bool myBool = false;
+
 float Don_Motor0 = 0;
 float Don_Motor1 = 0;
 float Don_Motor2 = 0;
@@ -28,16 +22,20 @@ float Don_Motor3 = 0;
 // float servo2 = 0;
 // float servo3 = 0;
 
-// 画面のレイアウトを定義
-ASCII_CUI::Layout main_layout, 
-                  motor_layout, Don_motor_layout, FP_layout, servo_layout, brushless_layout,
-                  Don_setting_layout, FP_setting_layout, servo_setting_layout, brushless_setting_layout,
-                  etc_layout;
 
 // main_layoutを初期状態でUI作成
 ASCII_CUI::UI UI(&main_layout);
 
 // 変更時に呼び出される関数を作成
+void Don_send(void){
+    if(abs(Don_Motor0) >25000 || abs(Don_Motor1) >25000 || abs(Don_Motor2) >25000 || abs(Don_Motor3) >25000){
+        UI << "Don_Motor's value is too large" << std::endl;
+        }else{
+            //ここに送信処理を書く
+        UI << "Successfully sent" << std::endl;
+        }
+}
+
 
 
 //ここまで
@@ -46,7 +44,7 @@ ASCII_CUI::UI UI(&main_layout);
 void setup() {
     main_layout = ASCII_CUI::Layout({
         {"Motor", "Motor's setting", &motor_layout},
-        {"etc", "etc's setting", &etc_layout}
+        {"etc", "etc menu", &etc_layout}
     },
         "Main menu"
     );
@@ -64,7 +62,7 @@ void setup() {
     Don_motor_layout = ASCII_CUI::Layout({
         {"Back","->motor", &motor_layout},
         {"Setting","Speed set", &Don_setting_layout},
-        {"send","Send the changes", &Don_motor_layout}
+        {"send","Send the changes", ASCII_CUI::Variable(&myBool),&Don_send}
     },
         "Don_motor menu"
     );
@@ -101,8 +99,20 @@ void setup() {
 
     etc_layout = ASCII_CUI::Layout({
         {"Back","->main", &main_layout},
+        {"about", "about this program", &about_layout},
+        {"author", "author", &author_layout}
     },
         "etc menu"
+    );
+    about_layout = ASCII_CUI::Layout({
+        {"Back","->etc", &etc_layout},
+    },
+        "about"
+    );
+    author_layout = ASCII_CUI::Layout({
+        {"Back","->etc", &etc_layout},
+    },
+        "Made by Nyayuta1060/ASCII_CUI by kazu-321"
     );
 }
 
